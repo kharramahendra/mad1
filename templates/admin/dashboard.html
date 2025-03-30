@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Quiz Master</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('admin.dashboard') }}">Quiz Master Admin</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin.subjects') }}">Subjects</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin.users') }}">Users</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <h2>Admin Dashboard</h2>
+        <p>Welcome to the Quiz Master admin panel. Manage subjects, chapters, quizzes, and users from here.</p>
+        
+        <!-- Statistics Cards -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="stat-card blue">
+                    <h3>{{ user_count }}</h3>
+                    <p>Registered Users</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card green">
+                    <h3>{{ subject_count }}</h3>
+                    <p>Subjects</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card orange">
+                    <h3>{{ quiz_count }}</h3>
+                    <p>Total Quizzes</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Charts Row -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Quizzes by Subject</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="quizzesBySubjectChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Recent User Registrations</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="userRegistrationsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap">
+                            <a href="{{ url_for('admin.add_subject') }}" class="btn btn-primary me-2 mb-2">Add Subject</a>
+                            <a href="{{ url_for('admin.subjects') }}" class="btn btn-success me-2 mb-2">Manage Subjects</a>
+                            <a href="{{ url_for('admin.users') }}" class="btn btn-info me-2 mb-2">Manage Users</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chart.js Implementation -->
+    <script>
+        // Mock data for charts - will be replaced with real data from the backend
+        document.addEventListener('DOMContentLoaded', function() {
+            // Quiz by Subject Chart
+            const ctxQuizzes = document.getElementById('quizzesBySubjectChart').getContext('2d');
+            new Chart(ctxQuizzes, {
+                type: 'pie',
+                data: {
+                    labels: {{ subject_names | tojson }},
+                    datasets: [{
+                        data: {{ subject_quiz_counts | tojson }},
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(153, 102, 255, 0.7)',
+                            'rgba(255, 159, 64, 0.7)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    }
+                }
+            });
+            
+            // User Registrations Chart
+            const ctxUsers = document.getElementById('userRegistrationsChart').getContext('2d');
+            new Chart(ctxUsers, {
+                type: 'line',
+                data: {
+                    labels: {{ registration_dates | tojson }},
+                    datasets: [{
+                        label: 'New Users',
+                        data: {{ registration_counts | tojson }},
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        tension: 0.1,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

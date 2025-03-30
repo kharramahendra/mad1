@@ -1,0 +1,40 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+
+# Flask instance folder (contains database files, sessions, etc.)
+instance/
+*.db
+*.sqlite
+
+# Logs and debug files
+*.log
+logs/
+debug.log
+
+# Static assets (optional, if dynamically generated)
+static/images/
+static/css/
+
+# Ignore compiled Python files
+*.pyc
+*.pyo
+*.pyd
+
+# VS Code settings
+.vscode/
+
+# IDE/editor files
+*.swp
+*.swo
+*.idea/
+*.iml
+
+# System files
+.DS_Store
+Thumbs.db
