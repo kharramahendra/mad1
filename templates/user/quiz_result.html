@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Quiz Result - Quiz Master{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('user.dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('user.my_scores') }}">My Scores</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Quiz Result</li>
+        </ol>
+    </nav>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title mb-0">Quiz Result</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>{{ quiz.chapter.subject.name }} - {{ quiz.chapter.name }}</h5>
+                    <p>Date of Quiz: {{ quiz.date_of_quiz.strftime('%d %B, %Y') }}</p>
+                    <p>Time Duration: {{ quiz.time_duration }}</p>
+                    <p>Attempted on: {{ score.time_stamp_of_attempt.strftime('%d %B, %Y at %H:%M') }}</p>
+                </div>
+                <div class="col-md-6 text-center">
+                    <div class="display-4 mb-2">
+                        {{ score.total_scored }}/{{ score.max_score }}
+                    </div>
+                    <div class="progress" style="height: 30px;">
+                        <div class="progress-bar 
+                            {% if percentage >= 80 %}
+                                bg-success
+                            {% elif percentage >= 60 %}
+                                bg-info
+                            {% elif percentage >= 40 %}
+                                bg-warning
+                            {% else %}
+                                bg-danger
+                            {% endif %}" 
+                            role="progressbar" 
+                            style="width: {{ percentage }}%;" 
+                            aria-valuenow="{{ percentage }}" 
+                            aria-valuemin="0" 
+                            aria-valuemax="100">{{ "%.1f"|format(percentage) }}%</div>
+                    </div>
+                    <p class="mt-2">
+                        {% if percentage >= 80 %}
+                            <span class="text-success">Excellent! Great job!</span>
+                        {% elif percentage >= 60 %}
+                            <span class="text-info">Good! Well done.</span>
+                        {% elif percentage >= 40 %}
+                            <span class="text-warning">Fair. Keep practicing!</span>
+                        {% else %}
+                            <span class="text-danger">Needs improvement. Try again!</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header bg-light">
+            <h4 class="card-title mb-0">Question Summary</h4>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info">
+                Detailed question review is not available in this version.
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-center mt-4">
+        <a href="{{ url_for('user.quizzes', chapter_id=quiz.chapter_id) }}" class="btn btn-primary">Back to Quizzes</a>
+        <a href="{{ url_for('user.dashboard') }}" class="btn btn-outline-secondary">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

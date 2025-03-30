@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Take Quiz - Quiz Master{% endblock %}
+
+{% block styles %}
+<style>
+    #timer {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    
+    .question-card {
+        margin-bottom: 2rem;
+    }
+    
+    .timer-warning {
+        color: #dc3545;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('user.dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('user.subjects') }}">Subjects</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('user.chapters', subject_id=quiz.chapter.subject_id) }}">{{ quiz.chapter.subject.name }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('user.quizzes', chapter_id=quiz.chapter_id) }}">{{ quiz.chapter.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Quiz</li>
+        </ol>
+    </nav>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ quiz.chapter.name }} Quiz</h1>
+        <div id="timer" class="py-2 px-3 bg-light rounded shadow-sm">
+            Time Remaining: <span id="time-display">{{ quiz.time_duration }}</span>
+        </div>
+    </div>
+    
+    <div class="alert alert-info">
+        <strong>Instructions:</strong> This quiz contains {{ questions|length }} questions. Read each question carefully and select the correct answer.
+    </div>
+    
+    <form id="quiz-form" method="POST" action="{{ url_for('user.submit_quiz', quiz_id=quiz.id) }}">
+        {% for question in questions %}
+        <div class="card question-card" id="question-{{ question.id }}">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Question {{ loop.index }}</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ question.question_statement }}</p>
+                
+                <div class="mt-4">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="option1_{{ question.id }}" value="1" required>
+                        <label class="form-check-label" for="option1_{{ question.id }}">
+                            {{ question.option1 }}
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="option2_{{ question.id }}" value="2">
+                        <label class="form-check-label" for="option2_{{ question.id }}">
+                            {{ question.option2 }}
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="option3_{{ question.id }}" value="3">
+                        <label class="form-check-label" for="option3_{{ question.id }}">
+                            {{ question.option3 }}
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="option4_{{ question.id }}" value="4">
+                        <label class="form-check-label" for="option4_{{ question.id }}">
+                            {{ question.option4 }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <div class="d-grid gap-2 col-md-6 mx-auto mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">Submit Quiz</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set up timer
+        let totalMinutes = {{ total_minutes }};
+        let totalSeconds = totalMinutes * 60;
+        
+        const timerDisplay = document.getElementById('time-display');
+        const timerElement = document.getElementById('timer');
+        const quizForm = document.getElementById('quiz-form');
+        
+        const timer = setInterval(function() {
+            totalSeconds--;
+            
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            
+            timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            if (totalSeconds <= 300) { // 5 minutes warning
+                timerElement.classList.add('timer-warning');
+            }
+            
+            if (totalSeconds <= 0) {
+                clearInterval(timer);
+                alert('Time is up! Your quiz will be submitted automatically.');
+                quizForm.submit();
+            }
+        }, 1000);
+        
+        // Warn before leaving page
+        window.addEventListener('beforeunload', function(e) {
+            e.preventDefault();
+            e.returnValue = 'You have an ongoing quiz. Are you sure you want to leave?';
+        });
+        
+        // Remove warning on form submit
+        quizForm.addEventListener('submit', function() {
+            window.removeEventListener('beforeunload', function() {});
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Quizzes - {{ chapter.name }} - Quiz Master{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('user.dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('user.subjects') }}">Subjects</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('user.chapters', subject_id=chapter.subject_id) }}">{{ chapter.subject.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ chapter.name }}</li>
+        </ol>
+    </nav>
+    
+    <h1 class="mb-4">Quizzes for {{ chapter.name }}</h1>
+    <p class="lead">{{ chapter.description }}</p>
+    
+    <div class="row">
+        {% for quiz in quizzes %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Quiz on {{ quiz.date_of_quiz.strftime('%d %B, %Y') }}</h5>
+                    <div class="mb-3">
+                        <span class="badge bg-info">Duration: {{ quiz.time_duration }}</span>
+                    </div>
+                    {% if quiz.remarks %}
+                    <p class="card-text">{{ quiz.remarks }}</p>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+                    {% if attempted_quizzes[quiz.id] %}
+                        <span class="text-success">
+                            <i class="bi bi-check-circle-fill"></i> Attempted
+                        </span>
+                        <a href="{{ url_for('user.take_quiz', quiz_id=quiz.id) }}" class="btn btn-outline-primary">Review Quiz</a>
+                    {% else %}
+                        <span>&nbsp;</span>
+                        <a href="{{ url_for('user.take_quiz', quiz_id=quiz.id) }}" class="btn btn-primary">Take Quiz</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                No quizzes available for this chapter yet.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Chapters - {{ subject.name }} - Quiz Master{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('user.dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('user.subjects') }}">Subjects</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ subject.name }}</li>
+        </ol>
+    </nav>
+    
+    <h1 class="mb-4">Chapters in {{ subject.name }}</h1>
+    <p class="lead">{{ subject.description }}</p>
+    
+    <div class="row">
+        {% for chapter in chapters %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">{{ chapter.name }}</h5>
+                    <p class="card-text">{{ chapter.description }}</p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{{ url_for('user.quizzes', chapter_id=chapter.id) }}" class="btn btn-primary">View Quizzes</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                No chapters available for this subject yet.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
