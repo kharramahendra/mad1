@@ -23,10 +23,10 @@ jobs:
           echo "::add-mask::$TOKEN"
           echo "token=$TOKEN" >> "$GITHUB_OUTPUT"
       - name: Download checks
-        run: curl -sSf -o checks.py "https://career.krishnaik.in/api/ci/checks.py?v=smartreco"
+        run: curl -sSf -o checks.py "https://careerapi-staging.krishnaik.in/api/ci/checks.py?v=smartreco"
       - name: Run checks
         env:
-          WEBHOOK_URL: https://career.krishnaik.in/api/ci/report
+          WEBHOOK_URL: https://careerapi-staging.krishnaik.in/api/ci/report
           SUBMISSION_TOKEN: ${{ secrets.SUBMISSION_TOKEN }}
           OIDC_TOKEN: ${{ steps.oidc.outputs.token }}
           PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
