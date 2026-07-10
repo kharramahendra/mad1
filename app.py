@@ -9,6 +9,7 @@ from controllers.admin_controller import admin
 import os
 from models import db
 
+
 def create_app():
     app = Flask(__name__)
     
