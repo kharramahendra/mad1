@@ -13,7 +13,11 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  # Where the API actually lives. This is the only value that changes between environments.
   API_BASE: https://careerapi-staging.krishnaik.in
+  # Opaque identifier stamped into the OIDC token. NOT a URL that gets fetched, and NOT
+  # environment-specific — the server accepts this exact string everywhere. Do not change it.
+  OIDC_AUDIENCE: https://career.krishnaik.in
   HACKATHON: smartreco-build-challenge-2026
 
 jobs:
@@ -34,7 +38,7 @@ jobs:
         run: |
           TOKEN=$(curl -sS \
             -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=${{ env.API_BASE }}" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=${{ env.OIDC_AUDIENCE }}" \
             | jq -r '.value')
           if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
             echo "::error::Could not get an OIDC token. Check 'permissions: id-token: write'."
