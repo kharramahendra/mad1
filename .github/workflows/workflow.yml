@@ -1,4 +1,4 @@
-name: SmartReco Checks
+name: AgentCare Checks
 
 on: [push]
 
@@ -9,7 +9,7 @@ permissions:
 # A newer push supersedes an older run. The server also rejects stale runs by run_id,
 # but cancelling here saves runner minutes.
 concurrency:
-  group: smartreco-checks-${{ github.ref }}
+  group: agentcare-checks-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -18,7 +18,7 @@ env:
   # Opaque identifier stamped into the OIDC token. NOT a URL that gets fetched, and NOT
   # environment-specific — the server accepts this exact string everywhere. Do not change it.
   OIDC_AUDIENCE: https://career.krishnaik.in
-  HACKATHON: smartreco-build-challenge-2026
+  HACKATHON: agentcare-build-challenge-2026
 
 jobs:
   checks:
@@ -26,12 +26,11 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install check dependencies
-        run: pip install pinecone
+      # No extra dependencies: these checks use only the Python standard library.
 
       - name: Request GitHub OIDC token
         id: oidc
@@ -69,6 +68,4 @@ jobs:
           WEBHOOK_URL: ${{ env.API_BASE }}/api/ci/report
           SUBMISSION_TOKEN: ${{ secrets.SUBMISSION_TOKEN }}
           OIDC_TOKEN: ${{ steps.oidc.outputs.token }}
-          PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
-          PINECONE_INDEX: ${{ secrets.PINECONE_INDEX }}
         run: python checks.py
