@@ -10,8 +10,6 @@ import os
 from models import db
 
 
-
-
 def create_app():
     app = Flask(__name__)
     
